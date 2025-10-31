@@ -25,3 +25,15 @@ python tools/spec-fetcher/spec-fetcher.py
 ```
 
 License: Apache-2.0
+
+## Usage
+
+ESM
+```js
+import RiigikoguOpenApiSpec from '@avalik/riigikogu-openapi-spec';
+```
+
+CJS
+```js
+const RiigikoguOpenApiSpec = require('@avalik/riigikogu-openapi-spec');
+```

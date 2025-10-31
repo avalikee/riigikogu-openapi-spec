@@ -1,0 +1,30 @@
+{
+    "name": "@avalik/riigikogu-openapi-spec",
+    "version": "0.0.0",
+    "description": "Riigikogu OpenAPI spec as a JavaScript object (ESM+CJS)",
+    "license": "Apache-2.0",
+    "main": "./js/index.cjs",
+    "module": "./js/index.mjs",
+    "types": "./js/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./js/index.mjs",
+            "require": "./js/index.cjs",
+            "default": "./js/index.mjs"
+        },
+        "./package.json": "./package.json"
+    },
+    "files": [
+        "js/index.mjs",
+        "js/index.cjs",
+        "js/index.d.ts",
+        "riigikogu-openapi.json",
+        "riigikogu-openapi.json.sha256",
+        "README.md",
+        "LICENSE"
+    ],
+    "sideEffects": false,
+    "publishConfig": {
+        "access": "public"
+    }
+}
