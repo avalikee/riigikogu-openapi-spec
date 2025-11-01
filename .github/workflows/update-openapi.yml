@@ -48,10 +48,6 @@ jobs:
               id: spec_version
               run: bun tools/read-spec-version.ts --json-file riigikogu-openapi.json >> "$GITHUB_OUTPUT"
 
-            - name: Check for file changes
-              id: check_changes
-              run: bun tools/check-file-changes.ts --files "riigikogu-openapi.json,riigikogu-openapi.json.sha256" >> "$GITHUB_OUTPUT"
-
             - name: Check if spec version changed
               id: check_spec_version
               run: bun tools/check-spec-version.ts --new-version "${{ steps.spec_version.outputs.version }}" >> "$GITHUB_OUTPUT"
@@ -63,14 +59,12 @@ jobs:
                       # On push to main: always bump patch (internal release)
                       bun tools/sync-version.ts --set-version "${{ steps.spec_version.outputs.version }}" --increment-revision >> "$GITHUB_OUTPUT"
                   else
-                      if [ "${{ steps.check_changes.outputs.changed }}" = "true" ]; then
-                          if [ "${{ steps.check_spec_version.outputs.spec_changed }}" = "true" ]; then
-                              bun tools/sync-version.ts --set-version "${{ steps.spec_version.outputs.version }}" >> "$GITHUB_OUTPUT"
-                          else
-                              bun tools/sync-version.ts --set-version "${{ steps.spec_version.outputs.version }}" --increment-revision >> "$GITHUB_OUTPUT"
-                          fi
+                      if [ "${{ steps.check_spec_version.outputs.spec_changed }}" = "true" ]; then
+                          # Spec version changed → major release
+                          bun tools/sync-version.ts --set-version "${{ steps.spec_version.outputs.version }}" >> "$GITHUB_OUTPUT"
                       else
-                          echo "updated=false" >> "$GITHUB_OUTPUT"
+                          # Spec version same → patch release (internal revision)
+                          bun tools/sync-version.ts --set-version "${{ steps.spec_version.outputs.version }}" --increment-revision >> "$GITHUB_OUTPUT"
                       fi
                   fi
 

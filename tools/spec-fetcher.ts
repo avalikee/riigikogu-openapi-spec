@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { createHash } from 'node:crypto';
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { parseArgs } from './utils/parse-args.js';
 
 const argMap = parseArgs(process.argv.slice(2));
@@ -52,105 +52,11 @@ function formatJson(data: Record<string, unknown>): string {
     return text.endsWith('\n') ? text : `${text}\n`;
 }
 
-function normalizeNewlines(text: string): string {
-    return text.replace(/\r\n/g, '\n');
-}
-
-/**
- * Normalizes JSON by sorting object keys recursively.
- * This ensures that field order differences don't cause false positives.
- */
-function normalizeJson(obj: unknown): unknown {
-    if (obj === null || typeof obj !== 'object') {
-        return obj;
-    }
-
-    if (Array.isArray(obj)) {
-        return obj.map(normalizeJson);
-    }
-
-    // For objects, sort keys and recursively normalize values
-    const sorted: Record<string, unknown> = {};
-    const keys = Object.keys(obj).sort();
-    for (const key of keys) {
-        sorted[key] = normalizeJson((obj as Record<string, unknown>)[key]);
-    }
-    return sorted;
-}
-
-/**
- * Compares two JSON objects semantically (ignoring field order).
- */
-function jsonEquals(a: unknown, b: unknown): boolean {
-    const normalizedA = normalizeJson(a);
-    const normalizedB = normalizeJson(b);
-    return JSON.stringify(normalizedA) === JSON.stringify(normalizedB);
-}
-
-interface ShaFileResult {
-    hash: string;
-    filename: string | null;
-}
-
-async function readShaFile(sha256Path: string): Promise<ShaFileResult | null> {
-    try {
-        const content = await readFile(sha256Path, 'utf-8');
-        const line = content.split('\n')[0]?.trim();
-        if (!line) return null;
-
-        const parts = line.split(/\s+/);
-        const hash = parts[0];
-
-        if (!hash || hash.length !== 64 || !/^[0-9a-f]{64}$/i.test(hash)) {
-            return null;
-        }
-
-        const filename = parts.length > 1 ? parts.slice(1).join(' ').trim() : null;
-        return { hash, filename };
-    } catch (error) {
-        if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
-        throw error;
-    }
-}
-
 try {
     const specData = await fetchSpecJson(URL);
 
-    let existingJson: Record<string, unknown> | null = null;
-    try {
-        const existingText = await readFile(OUT_JSON, 'utf-8');
-        existingJson = JSON.parse(existingText) as Record<string, unknown>;
-    } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
-    }
-
-    // Compare JSON semantically (ignoring field order)
-    const jsonChanged = !existingJson || !jsonEquals(existingJson, specData);
-    
-    // Normalize and format the JSON for writing (ensures consistent field order)
-    const normalizedSpecData = normalizeJson(specData) as Record<string, unknown>;
-    const newText = formatJson(normalizedSpecData);
-
-    let shaNeedsUpdate = false;
-    if (!jsonChanged && existingJson) {
-        const parsed = await readShaFile(OUT_SHA256);
-        if (!parsed) {
-            shaNeedsUpdate = true;
-        } else {
-            // Calculate hash of the normalized JSON text for consistency
-            const normalizedNewText = normalizeNewlines(newText);
-            const currentHash = createHash('sha256').update(normalizedNewText, 'utf-8').digest('hex');
-            if (parsed.hash !== currentHash) {
-                shaNeedsUpdate = true;
-            }
-        }
-    }
-
-    if (!jsonChanged && !shaNeedsUpdate) {
-        process.stdout.write('unchanged\n');
-        process.exit(0);
-    }
-
+    // Format and write the spec (we don't compare contents, only version)
+    const newText = formatJson(specData);
     await writeFile(OUT_JSON, newText, 'utf-8');
     const hash = createHash('sha256').update(newText, 'utf-8').digest('hex');
     await writeFile(OUT_SHA256, `${hash}  ${OUT_JSON}\n`, 'utf-8');
