@@ -83,15 +83,8 @@ jobs:
                   git commit -m "release: v${{ steps.sync_version.outputs.version }}" --no-verify
                   git push
 
-            - name: Set up Node.js for npm publish
+            - name: Publish to npm with Bun
               if: steps.sync_version.outputs.updated == 'true'
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22"
-                  registry-url: "https://registry.npmjs.org"
-
-            - name: Publish to npm
-              if: steps.sync_version.outputs.updated == 'true'
-              run: npm publish --access public
+              run: bun publish --access public --tolerate-republish
               env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
