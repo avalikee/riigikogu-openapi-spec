@@ -79,8 +79,8 @@ jobs:
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                  git add riigikogu-openapi.json riigikogu-openapi.json.sha256 package.json README.md LICENSE
-                  git commit -m "chore: automated version bump and generated files"
+                  git add riigikogu-openapi.json riigikogu-openapi.json.sha256 package.json
+                  git commit -m "release: v${{ steps.sync_version.outputs.version }}" --no-verify
                   git push
 
             - name: Set up Node.js for npm publish

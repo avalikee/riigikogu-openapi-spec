@@ -57,10 +57,12 @@ try {
         console.error(`Version updated: ${currentVersion} → ${newVersion}`);
     } else {
         console.error(`Version unchanged: ${currentVersion}`);
+        newVersion = currentVersion;
     }
 
     // Output GitHub Actions output format
     console.log(`updated=${updated}`);
+    console.log(`version=${newVersion}`);
     process.exit(0);
 } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
