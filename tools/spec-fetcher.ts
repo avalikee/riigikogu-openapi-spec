@@ -56,6 +56,37 @@ function normalizeNewlines(text: string): string {
     return text.replace(/\r\n/g, '\n');
 }
 
+/**
+ * Normalizes JSON by sorting object keys recursively.
+ * This ensures that field order differences don't cause false positives.
+ */
+function normalizeJson(obj: unknown): unknown {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map(normalizeJson);
+    }
+
+    // For objects, sort keys and recursively normalize values
+    const sorted: Record<string, unknown> = {};
+    const keys = Object.keys(obj).sort();
+    for (const key of keys) {
+        sorted[key] = normalizeJson((obj as Record<string, unknown>)[key]);
+    }
+    return sorted;
+}
+
+/**
+ * Compares two JSON objects semantically (ignoring field order).
+ */
+function jsonEquals(a: unknown, b: unknown): boolean {
+    const normalizedA = normalizeJson(a);
+    const normalizedB = normalizeJson(b);
+    return JSON.stringify(normalizedA) === JSON.stringify(normalizedB);
+}
+
 interface ShaFileResult {
     hash: string;
     filename: string | null;
@@ -84,26 +115,31 @@ async function readShaFile(sha256Path: string): Promise<ShaFileResult | null> {
 
 try {
     const specData = await fetchSpecJson(URL);
-    const newText = formatJson(specData);
 
-    let existing: string | null = null;
+    let existingJson: Record<string, unknown> | null = null;
     try {
-        existing = await readFile(OUT_JSON, 'utf-8');
+        const existingText = await readFile(OUT_JSON, 'utf-8');
+        existingJson = JSON.parse(existingText) as Record<string, unknown>;
     } catch (error) {
         if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
     }
 
-    const normalizedExisting = existing ? normalizeNewlines(existing) : null;
-    const normalizedNew = normalizeNewlines(newText);
-    const jsonChanged = normalizedExisting !== normalizedNew;
+    // Compare JSON semantically (ignoring field order)
+    const jsonChanged = !existingJson || !jsonEquals(existingJson, specData);
+    
+    // Normalize and format the JSON for writing (ensures consistent field order)
+    const normalizedSpecData = normalizeJson(specData) as Record<string, unknown>;
+    const newText = formatJson(normalizedSpecData);
 
     let shaNeedsUpdate = false;
-    if (!jsonChanged && existing) {
+    if (!jsonChanged && existingJson) {
         const parsed = await readShaFile(OUT_SHA256);
         if (!parsed) {
             shaNeedsUpdate = true;
         } else {
-            const currentHash = createHash('sha256').update(normalizedExisting, 'utf-8').digest('hex');
+            // Calculate hash of the normalized JSON text for consistency
+            const normalizedNewText = normalizeNewlines(newText);
+            const currentHash = createHash('sha256').update(normalizedNewText, 'utf-8').digest('hex');
             if (parsed.hash !== currentHash) {
                 shaNeedsUpdate = true;
             }
