@@ -50,7 +50,7 @@ jobs:
 
             - name: Check for file changes
               id: check_changes
-            run: bun tools/check-file-changes.ts --files "riigikogu-openapi.json,riigikogu-openapi.json.sha256" >> "$GITHUB_OUTPUT"
+              run: bun tools/check-file-changes.ts --files "riigikogu-openapi.json,riigikogu-openapi.json.sha256" >> "$GITHUB_OUTPUT"
 
             - name: Check if spec version changed
               id: check_spec_version
@@ -79,7 +79,7 @@ jobs:
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-                git add riigikogu-openapi.json riigikogu-openapi.json.sha256 package.json
+                  git add riigikogu-openapi.json riigikogu-openapi.json.sha256 package.json README.md LICENSE
                   git commit -m "chore: automated version bump and generated files"
                   git push
 
@@ -87,8 +87,8 @@ jobs:
               if: steps.sync_version.outputs.updated == 'true'
               uses: actions/setup-node@v4
               with:
-                  node-version: '22'
-                  registry-url: 'https://registry.npmjs.org'
+                  node-version: "22"
+                  registry-url: "https://registry.npmjs.org"
 
             - name: Publish to npm
               if: steps.sync_version.outputs.updated == 'true'
