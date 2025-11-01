@@ -1,19 +1,19 @@
-name: Update Riigikogu OpenAPI
+name: Publish on Push (Patch Release)
 
 on:
-    schedule:
-        - cron: "0 20 * * *" # Daily 20:00 UTC
-    workflow_dispatch:
+    push:
+        branches:
+            - main
 
 permissions:
     contents: write
 
 concurrency:
-    group: update-openapi
+    group: publish-on-push
     cancel-in-progress: true
 
 jobs:
-    update:
+    publish:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -28,12 +28,7 @@ jobs:
               run: bun install --frozen-lockfile
 
             - name: Run spec-fetcher
-              id: fetch
-              run: |
-                  set -e
-                  result=$(bun tools/spec-fetcher.ts --url "https://api.riigikogu.ee/v3/api-docs" --output-json "riigikogu-openapi.json" --output-sha256 "riigikogu-openapi.json.sha256" | tail -n 1)
-                  echo "$result"
-                  echo "status=$result" >> "$GITHUB_OUTPUT"
+              run: bun tools/spec-fetcher.ts --url "https://api.riigikogu.ee/v3/api-docs" --output-json "riigikogu-openapi.json" --output-sha256 "riigikogu-openapi.json.sha256"
 
             - name: Render template files
               run: bun tools/render-templates.ts
@@ -49,16 +44,9 @@ jobs:
               id: check_spec_version
               run: bun tools/check-spec-version.ts --new-version "${{ steps.spec_version.outputs.version }}" >> "$GITHUB_OUTPUT"
 
-            - name: Sync package.json version
+            - name: Sync package.json version (patch)
               id: sync_version
-              run: |
-                  if [ "${{ steps.check_spec_version.outputs.spec_changed }}" = "true" ]; then
-                      # Spec version changed → major release
-                      bun tools/sync-version.ts --set-version "${{ steps.spec_version.outputs.version }}" >> "$GITHUB_OUTPUT"
-                  else
-                      # Spec version same → patch release (internal revision)
-                      bun tools/sync-version.ts --set-version "${{ steps.spec_version.outputs.version }}" --increment-revision >> "$GITHUB_OUTPUT"
-                  fi
+              run: bun tools/sync-version.ts --set-version "${{ steps.spec_version.outputs.version }}" --increment-revision >> "$GITHUB_OUTPUT"
 
             - name: Commit generated files and version bump
               if: steps.sync_version.outputs.updated == 'true'
