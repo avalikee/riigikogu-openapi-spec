@@ -1,0 +1,3 @@
+// Generated on {{DATE}} — do not edit
+module.exports = {{JSON}};
+
