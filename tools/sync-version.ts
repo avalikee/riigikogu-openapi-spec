@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 import { readFile, writeFile } from 'node:fs/promises';
+import { execSync } from 'node:child_process';
 import { parseArgs } from './utils/parse-args.js';
 import semver from 'semver';
 
@@ -54,6 +55,15 @@ try {
     if (updated) {
         pkg.version = newVersion;
         await writeFile('package.json', JSON.stringify(pkg, null, 2) + '\n');
+        
+        // Format with Prettier to respect .prettierrc.json and .editorconfig
+        try {
+            execSync('prettier --write package.json', { stdio: 'pipe' });
+        } catch (error) {
+            // If Prettier is not available, continue without formatting
+            // (The JSON is still valid with 2-space indent)
+        }
+        
         console.error(`Version updated: ${currentVersion} → ${newVersion}`);
     } else {
         console.error(`Version unchanged: ${currentVersion}`);
