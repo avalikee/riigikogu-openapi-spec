@@ -1,4 +1,0 @@
-// Generated on {{DATE}} — do not edit
-declare const spec: Record<string, unknown>;
-export default spec;
-

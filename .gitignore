@@ -1,0 +1,7 @@
+# npm pack tarballs
+*.tgz
+
+# Dependencies
+node_modules/
+
+dest/
