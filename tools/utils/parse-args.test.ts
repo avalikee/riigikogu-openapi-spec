@@ -26,13 +26,13 @@ test('parseArgs - empty array', () => {
     assert.strictEqual(result.size, 0);
 });
 
-test('parseArgs - odd number of args (incomplete pair)', () => {
-    const args = ['--key1', 'value1', '--key2'];
+test('parseArgs - boolean flag support (no value)', () => {
+    const args = ['--key1', 'value1', '--flag'];
     const result = parseArgs(args);
 
     assert.strictEqual(result.get('key1'), 'value1');
-    assert.strictEqual(result.get('key2'), undefined);
-    assert.strictEqual(result.size, 1);
+    assert.strictEqual(result.get('flag'), 'true');
+    assert.strictEqual(result.size, 2);
 });
 
 test('parseArgs - arguments without -- prefix', () => {
