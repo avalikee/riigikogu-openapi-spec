@@ -1,35 +1,35 @@
 {
-  "name": "@avalik/riigikogu-openapi-spec",
-  "version": "2.0.0",
-  "description": "Riigikogu OpenAPI spec as a JavaScript object (ESM+CJS)",
-  "license": "Apache-2.0",
-  "main": "./dest/index.cjs",
-  "module": "./dest/index.mjs",
-  "types": "./dest/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dest/index.mjs",
-      "require": "./dest/index.cjs",
-      "default": "./dest/index.mjs"
+    "name": "@avalik/riigikogu-openapi-spec",
+    "version": "3.0.0",
+    "description": "Riigikogu OpenAPI spec as a JavaScript object (ESM+CJS)",
+    "license": "Apache-2.0",
+    "main": "./dest/index.cjs",
+    "module": "./dest/index.mjs",
+    "types": "./dest/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dest/index.mjs",
+            "require": "./dest/index.cjs",
+            "default": "./dest/index.mjs"
+        },
+        "./package.json": "./package.json"
     },
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "dest/index.mjs",
-    "dest/index.cjs",
-    "dest/index.d.ts",
-    "riigikogu-openapi.json",
-    "riigikogu-openapi.json.sha256",
-    "README.md",
-    "LICENSE"
-  ],
-  "sideEffects": false,
-  "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@types/semver": "^7.5.8",
-    "semver": "^7.7.3"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
+    "files": [
+        "dest/index.mjs",
+        "dest/index.cjs",
+        "dest/index.d.ts",
+        "riigikogu-openapi.json",
+        "riigikogu-openapi.json.sha256",
+        "README.md",
+        "LICENSE"
+    ],
+    "sideEffects": false,
+    "devDependencies": {
+        "@types/node": "^22.0.0",
+        "@types/semver": "^7.5.8",
+        "semver": "^7.7.3"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
 }
