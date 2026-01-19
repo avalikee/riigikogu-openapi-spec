@@ -3,7 +3,7 @@
   "info": {
     "title": "Riigikogu avaandmete dokumentatsioon",
     "description": "Riigikogu avaandmete REST API dokumentatsioon",
-    "version": "2.21.4"
+    "version": "2.21.5"
   },
   "servers": [
     {
@@ -3421,7 +3421,7 @@
           "Riigikogu liikmed"
         ],
         "summary": "Riigikogu liikme detailid",
-        "description": "Väljastab liikme detailandmed. Võimaldab kasutaja koodi järgi, otsida saab kõiki või ainult aktiivseid kasutjaid. Tagastab riigikogu liikme kohta järgmised andmed: lingi, ID, eesnime, perekonnanime, täisnime, aktiivsuse, e-postiaadressi, telefoninumbri, veebilehe urli, aadressi, kabineti numbri, lühitutvustust, biograafia, foto  andmed (ID, failinimi, faililaiend, foto link, kuni 5 fotod), loend isiku isikukaardile märgitud sotsiaalmeediast (tüüp, url), loend isiku isikukaardile märgitud ajakirjandustegevusest (kirjeldus, url, koosseisu number, kuupäev), juhitud eelnõude loetelu (eelnõu toimiku uuid, pealkiri, registreerimisnumber, originaal või koopia, link eelnõu detailandmetele), isiku poolt algatatud eelnõude loetelu  (eelnõu toimiku uuid, pealkiri, registreerimisnumber, originaal või koopia, link  eelnõu detailandmetele), loetelu isikuga seotud arupärimised (uuid, pealkiri, esitamise kuupäev, link detailandmetele, tagastatakse 5 viimast), loetelu isikuga seotud kirjalikest küsimustest (uuid, pealkiri, esitamise kuupäev, link detailandmetele, tagastatakse 5 viimast), ühendused, kuhu isik kuulub (uuid, nimi, aktiivsus, link), delegatsioonid, kuhu isik kuulub (uuid, nimi, aktiivsus, link), parlamendi rühmad, kuhu isik kuulub (uuid, nimi, aktiivsus, link), isikuga seotud seotud viimased 10 hääletust (uuid, kirjeldus, hääletuse alguskuupäev ja kellaaeg), isikuga seotud viimane kõne; tagastatakse vaid juhul, kui sisendparameeter querySteno=true (pealkiri, lõik sõnavõtu algusest, link), sünnikuupäev, surmakuupäev, sugu, andmed koosseisude kohta isik kuulus, iga koosseisu kohta tagastatakse selle number, isiku vanus koosseisus, rollid koosseisu ajal (alguse kuupäev, lõpukuupäev, roll, ametinimetus), kasutajaga seotud fraktsioonide andmed (uuid, nimi, tüüp, aktiivsus, koosseisu number, algusekuupev, lõpukuupäev, roll, ametinimetus), komisjonide loetelu, kuhu isik kuulus (grupi uuid, nimi, aktiivsus, koosseisu number, algusekuupev, lõpukuupäev, roll, ametinimetus), valimisringkonna koodi, valimisringkonna väärtuse.",
+        "description": "Väljastab liikme detailandmed. Võimaldab kasutaja koodi järgi, otsida saab kõiki või ainult aktiivseid kasutjaid. Tagastab riigikogu liikme kohta järgmised andmed: lingi, ID, eesnime, perekonnanime, täisnime, aktiivsuse, e-postiaadressi, telefoninumbri, veebilehe urli, aadressi, kabineti numbri, lühitutvustust, biograafia, foto  andmed (ID, failinimi, faililaiend, foto link, kuni 5 fotod), loend isiku isikukaardile märgitud sotsiaalmeediast (tüüp, url), loend isiku isikukaardile märgitud ajakirjandustegevusest (kirjeldus, url, koosseisu number, kuupäev), juhitud eelnõude loetelu (eelnõu toimiku uuid, pealkiri, registreerimisnumber, originaal või koopia, link eelnõu detailandmetele), isiku poolt algatatud eelnõude loetelu  (eelnõu toimiku uuid, pealkiri, registreerimisnumber, originaal või koopia, link  eelnõu detailandmetele), loetelu isikuga seotud arupärimised (uuid, pealkiri, esitamise kuupäev, link detailandmetele, tagastatakse 5 viimast), loetelu isikuga seotud kirjalikest küsimustest (uuid, pealkiri, esitamise kuupäev, link detailandmetele, tagastatakse 5 viimast), ühendused, kuhu isik kuulub (uuid, nimi, aktiivsus, link), delegatsioonid, kuhu isik kuulub (uuid, nimi, aktiivsus, link), parlamendi rühmad, kuhu isik kuulub (uuid, nimi, aktiivsus, link), isikuga seotud seotud viimased 10 hääletust (uuid, kirjeldus, hääletuse alguskuupäev ja kellaaeg), isikuga seotud viimane kõne; tagastatakse vaid juhul, kui sisendparameeter querySteno=true (pealkiri, lõik sõnavõtu algusest, link), sünnikuupäev, surmakuupäev, sugu, andmed koosseisude kohta isik kuulus, iga koosseisu kohta tagastatakse selle number, isiku vanus koosseisus, rollid koosseisu ajal (alguse kuupäev, lõpukuupäev, roll, ametinimetus), kasutajaga seotud fraktsioonide andmed (uuid, nimi, tüüp, aktiivsus, koosseisu number, algusekuupev, lõpukuupäev, roll, ametinimetus), komisjonide loetelu, kuhu isik kuulus (grupi uuid, nimi, aktiivsus, koosseisu number, algusekuupev, lõpukuupäev, roll, ametinimetus), valimisringkonna koodi, valimisringkonna väärtuse, päringu staatuse, esinenud veateated.",
         "operationId": "getPlenaryMemberDetails",
         "parameters": [
           {
@@ -9426,6 +9426,22 @@
             "description": "Koosseisud",
             "items": {
               "$ref": "#/components/schemas/MembershipInfo"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "Staatuse väli: OK või PARTIAL",
+            "enum": [
+              "OK",
+              "PARTIAL"
+            ]
+          },
+          "errors": {
+            "type": "array",
+            "description": "Veateated, kui neid esines",
+            "items": {
+              "type": "string",
+              "description": "Veateated, kui neid esines"
             }
           },
           "upn": {
