@@ -1,6 +1,6 @@
 {
     "name": "@avalik/riigikogu-openapi-spec",
-    "version": "8.0.21",
+    "version": "8.0.22",
     "description": "Riigikogu OpenAPI spec as a JavaScript object (ESM+CJS)",
     "license": "Apache-2.0",
     "main": "./dest/index.cjs",
